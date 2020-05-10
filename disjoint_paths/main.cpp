@@ -57,7 +57,7 @@ protected:
 		});
 
 		out->print_tty("\n\nDistance to disjoint paths is %zu.\n", res->size());
-		if (sol == out) out->print("\n");
+		if (sol == out) out->print_tty("\n");
 		sol->print("%zu\n", res->size());
 		for (int u : *res) sol->print("%d ", u);
 		sol->print("\n");
