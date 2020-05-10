@@ -3,6 +3,7 @@ This is an implementation of the MESP FPT algorithm parametrized by the distance
 
 This project uses Boost library version 1.72. It can be built using cmake:
 ```bash
+export BOOST_ROOT=<path-to-boost>
 cmake -S . -B <path-to-build>
 cmake --build <path-to-build> --target all
 ```
