@@ -57,11 +57,16 @@ private:
 	{
 		auto candidate_segments = get_segments();
 		if (!candidate_segments.has_value()) return false;
-
 		std::unordered_set<int> I(L.begin(), L.end());
-		for (auto &C_i : *candidate_segments) {
-			if (C_i.size() > 1) continue;
-			for (int u : C_i[0]) I.insert(u);
+		std::vector<int> h_inv((*candidate_segments).size(), -1);
+		std::vector<std::vector<path>> candidates;
+		for (int i = 0; i < candidate_segments->size(); i++) {
+			if ((*candidate_segments)[i].size() == 1) {
+				for (int u : (*candidate_segments)[i][0]) I.insert(u);
+				continue;
+			}
+			candidates.emplace_back(std::move((*candidate_segments)[i]));
+			h_inv[i] = candidates.size() - 1;
 		}
 
 		std::unordered_set<int> U;
@@ -92,15 +97,14 @@ private:
 			}
 			return res;
 		};
-		auto true_segment_id = constrained_set_cover(requirements, *candidate_segments, psi);
+		auto true_segment_id = constrained_set_cover(requirements, candidates, psi);
 		if (!true_segment_id.has_value()) return false;
 
 		solution.clear();
 		for (int i = 0; i < pi.size() - 1; i++) {
 			solution.push_back(pi[i]);
-			for (int s : (*candidate_segments)[i][(*true_segment_id)[i]]) {
-				solution.push_back(s);
-			}
+			path &segment = h_inv[i] == -1 ? (*candidate_segments)[i][0] : candidates[h_inv[i]][(*true_segment_id)[h_inv[i]]];
+			for (int s : segment) solution.push_back(s);
 		}
 		solution.push_back(pi.back());
 		return G->ecc(solution) <= k;
