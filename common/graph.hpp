@@ -76,7 +76,7 @@ public:
 	}
 
 
-	int ecc(const std::vector<int> &S) {
+	int ecc(const std::vector<int> &S) const {
 		std::queue<int> q;
 		std::vector<int> dst(n, -1);
 		for (int u : S) {
