@@ -21,12 +21,13 @@ public:
 protected:
 	void print_usage() const override {
 		out->print(
-			"Usage: " + cmd_name() + " [<options>...] <graph-file> <disjoint-paths-file>\n"
-			 "Finds the minimum eccentricity shortest path in a given graph.\n"
-			 "\n"
-			 "Options:\n"
-			 "  -j <jobs>, --parallel <jobs>\t\tUse <jobs> threads. Default value is 8.\n"
-			 "  -o <file>, --output <file>\t\tWrite the solution to <file> instead of stdout.\n"
+			"Usage: " + cmd_name() + " [<options>...] [<graph-file> <disjoint-paths-file>]\n"
+			"Finds the minimum eccentricity shortest path in a given graph.\n"
+			"If no <graph-file> and <disjoint-paths-file> are provided, attempts to read from stdin.\n"
+			"\n"
+			"Options:\n"
+			"  -j <jobs>, --parallel <jobs>\t\tUse <jobs> threads. Default value is 8.\n"
+			"  -o <file>, --output <file>\t\tWrite the solution to <file> instead of stdout.\n"
 			"\n"
 			"Input graph format:\n" +
 			graph_format_desc() + "\n"
@@ -63,7 +64,7 @@ protected:
 			}
 		}
 
-		if (!graph_filename.has_value() || !dp_filename.has_value()) {
+		if (!graph_filename.has_value() xor !dp_filename.has_value()) {
 			throw missing_arguments_exception();
 		}
 
@@ -79,16 +80,24 @@ protected:
 			}
 		}
 
+		auto graph_input = in;
+		if (graph_filename.has_value()) {
+			graph_input = make_shared<reader>(open(*graph_filename, "r"));
+		}
+
+		auto dp_input = in;
+		if (dp_filename.has_value()) {
+			dp_input = make_shared<reader>(open(*dp_filename, "r"));
+		}
+
 		auto sol = out;
 		if (output_filename.has_value()) {
 			sol = make_shared<writer>(open(*output_filename, "w"));
 		}
 
-		auto graph_input = reader(open(*graph_filename, "r"));
-		auto dp_input =  reader(open(*dp_filename, "r"));
 
-		auto G = read_graph(graph_input);
-		auto C = read_disjoint_paths(dp_input);
+		auto G = read_graph(*graph_input);
+		auto C = read_disjoint_paths(*dp_input);
 
 		auto time0 = system_clock::now();
 		thread_pool pool(threads);
