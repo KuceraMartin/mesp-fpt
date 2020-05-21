@@ -75,7 +75,7 @@ mesp_solution mesp_multithread(
 	};
 
 
-	for (int k = 1; k <= G->n; k++) {
+	for (int k = 0; k <= G->n; k++) {
 		auto status = std::make_shared<threads_status>();
 		int attempts = 0;
 		if (C->size() >= 2) {
