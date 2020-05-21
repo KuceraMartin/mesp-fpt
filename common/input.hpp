@@ -16,18 +16,18 @@ public:
 	FILE *stream;
 
 private:
-	bool do_close;
+	bool do_close = false;
 
 public:
 	file(const std::string &name, const char *mode):
-		stream(fopen(name.c_str(), mode)),
-		do_close(true)
-	{}
+		stream(fopen(name.c_str(), mode))
+	{
+		do_close = stream != NULL;
+	}
 
 
 	file(FILE *f):
-		stream(f),
-		do_close(false)
+		stream(f)
 	{}
 
 
