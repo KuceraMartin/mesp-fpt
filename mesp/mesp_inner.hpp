@@ -133,27 +133,25 @@ private:
 			}
 			if (!dst.count(pi[i])) return false;
 			if (dst[pi[i]] != G->distance(pi[i + 1], pi[i])) return false;
-			int segment_id = -1;
+			std::vector<path> Sigma;
+			std::vector<int> K;
 			for (int u : G->neighbors(pi[i])) {
 				if (!dst.count(u) || dst[u] != dst[pi[i]] - 1) continue;
 				if (u == pi[i + 1]) {
-					candidate_segments[i].emplace_back();
+					Sigma.emplace_back();
 					break;
 				}
 				for (int v : G->neighbors(u)) {
 					if (!dst.count(v) || dst[v] != dst[u] - 1) continue;
-					candidate_segments[i].push_back({u});
-					segment_id++;
+					Sigma.push_back({u});
+					int K_added = 0;
 					while (v != pi[i + 1]) {
-						int p = candidate_segments[i].back().back();
-						candidate_segments[i].back().push_back(v);
+						int p = Sigma.back().back();
 						if (estimate_path_dst(v) > k) {
-							if (true_segment_id[i] == -1) {
-								true_segment_id[i] = segment_id;
-							} else if (true_segment_id[i] != segment_id) {
-								return false;
-							}
+							if (K_added++ < 2) K.push_back(v);
+							if (K.size() > 4) return false;
 						}
+						Sigma.back().push_back(v);
 						for (int n : G->neighbors(v)) {
 							if (!dst.count(n) || dst[n] != dst[v] - 1) continue;
 							if (n == p) continue;
@@ -161,6 +159,17 @@ private:
 							break;
 						}
 					}
+				}
+			}
+			for (auto &segment : Sigma) {
+				std::vector<int> K_sat(K.size(), 0);
+				for (int j = 0; j < K.size(); j++) {
+					K_sat[j] |= G->distance(K[j], segment) <= k;
+				}
+				bool is_sat = true;
+				for (bool s : K_sat) is_sat |= s;
+				if (is_sat) {
+					candidate_segments[i].emplace_back(std::move(segment));
 				}
 			}
 			if (candidate_segments[i].size() == 1) {
