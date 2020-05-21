@@ -43,9 +43,9 @@ std::shared_ptr<std::unordered_set<int>> modulator_to_disjoint_paths(std::shared
 					if (visited[u]) continue;
 					visited[u] = 1;
 					bool is_cycle = false;
-					int p = u;
 					for (int v : G->neighbors(u)) {
 						if (res->count(v)) continue;
+						int p = u;
 						while (true) {
 							if (visited[v]) {
 								is_cycle = true;
