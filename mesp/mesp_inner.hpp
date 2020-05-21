@@ -55,19 +55,13 @@ public:
 private:
 	bool solve_inner()
 	{
-		std::vector<std::vector<path>> candidate_segments;
-		std::vector<int> true_segment_id;
-		if (!check_segments(candidate_segments, true_segment_id)) return false;
+		auto candidate_segments = get_segments();
+		if (!candidate_segments.has_value()) return false;
 
-		std::unordered_set<int> I;
-		for (int u : L) {
-			I.insert(u);
-		}
-		for (int i = 0; i < true_segment_id.size(); i++) {
-			if (true_segment_id[i] == -1) continue;
-			for (int u : candidate_segments[i][true_segment_id[i]]) {
-				I.insert(u);
-			}
+		std::unordered_set<int> I(L.begin(), L.end());
+		for (auto &C_i : *candidate_segments) {
+			if (C_i.size() > 1) continue;
+			for (int u : C_i[0]) I.insert(u);
 		}
 
 		std::unordered_set<int> U;
@@ -98,12 +92,13 @@ private:
 			}
 			return res;
 		};
-		if (!constrained_set_cover(requirements, candidate_segments, psi, true_segment_id)) return false;
+		auto true_segment_id = constrained_set_cover(requirements, *candidate_segments, psi);
+		if (!true_segment_id.has_value()) return false;
 
 		solution.clear();
 		for (int i = 0; i < pi.size() - 1; i++) {
 			solution.push_back(pi[i]);
-			for (int s : candidate_segments[i][true_segment_id[i]]) {
+			for (int s : (*candidate_segments)[i][(*true_segment_id)[i]]) {
 				solution.push_back(s);
 			}
 		}
@@ -112,10 +107,9 @@ private:
 	}
 
 
-	bool check_segments(std::vector<std::vector<path>> &candidate_segments, std::vector<int> &true_segment_id) const
+	std::optional<std::vector<std::vector<path>>> get_segments() const
 	{
-		candidate_segments.resize(pi.size() - 1);
-		true_segment_id.resize(pi.size() - 1, -1);
+		std::vector<std::vector<path>> candidate_segments(pi.size() - 1);
 		for (int i = 0; i < pi.size() - 1; i++) {
 			std::queue<int> q;
 			q.push(pi[i + 1]);
@@ -131,8 +125,8 @@ private:
 					q.push(v);
 				}
 			}
-			if (!dst.count(pi[i])) return false;
-			if (dst[pi[i]] != G->distance(pi[i + 1], pi[i])) return false;
+			if (!dst.count(pi[i])) return std::nullopt;
+			if (dst[pi[i]] != G->distance(pi[i + 1], pi[i])) return std::nullopt;
 			std::vector<path> Sigma;
 			std::vector<int> K;
 			for (int u : G->neighbors(pi[i])) {
@@ -149,7 +143,7 @@ private:
 						int p = Sigma.back().back();
 						if (estimate_path_dst(v) > k) {
 							if (K_added++ < 2) K.push_back(v);
-							if (K.size() > 4) return false;
+							if (K.size() > 4) return std::nullopt;
 						}
 						Sigma.back().push_back(v);
 						for (int n : G->neighbors(v)) {
@@ -172,11 +166,8 @@ private:
 					candidate_segments[i].emplace_back(std::move(segment));
 				}
 			}
-			if (candidate_segments[i].size() == 1) {
-				true_segment_id[i] = 0;
-			}
 		}
-		return true;
+		return candidate_segments;
 	}
 
 
