@@ -19,33 +19,26 @@ bool constrained_set_cover(
 		boost::dynamic_bitset<> prev;
 	};
 	std::vector<std::unordered_map<boost::dynamic_bitset<>, satisfied_by>> D(candidates.size() + 1);
-	boost::dynamic_bitset<> satisfied(requirements.size(), 0);
+	D[0] = {{boost::dynamic_bitset<>(requirements.size()), {-1, boost::dynamic_bitset<>()}}};
 	for (int i = 0; i < candidates.size(); i++) {
-		if (res_candidate_id[i] == -1) continue;
-		satisfied |= psi(candidates[i][res_candidate_id[i]]);
-	}
-	D[0] = {{satisfied, {-1, boost::dynamic_bitset<>()}}};
-	int prev = 0;
-	for (int i = 0; i < candidates.size(); i++) {
-		if (res_candidate_id[i] != -1) continue;
-		for (int j = 0; j < candidates[i].size(); j++) {
-			auto &candidate = candidates[i][j];
-			for (auto [r, _] : D[prev]) {
-				D[i + 1][r | psi(candidate)] = {j, r};
+		for (auto [r, _] : D[i]) {
+			if (res_candidate_id[i] != -1) {
+				D[i + 1][r | psi(candidates[i][res_candidate_id[i]])] = {res_candidate_id[i], r};
+				continue;
+			}
+			for (int j = 0; j < candidates[i].size(); j++) {
+				D[i + 1][r | psi(candidates[i][j])] = {j, r};
 			}
 		}
-		prev = i + 1;
 	}
 	boost::dynamic_bitset<> R;
 	R.resize(requirements.size(), 1);
-	for (prev = candidates.size(); prev >= 1 && res_candidate_id[prev - 1] != -1; prev--);
-	for (int i = prev; i > 0; i--) {
-		if (res_candidate_id[i - 1] != -1) continue;
+	for (int i = candidates.size(); i > 0; i--) {
 		if (!D[i].count(R)) return false;
 		res_candidate_id[i - 1] = D[i][R].candidate_id;
 		R = D[i][R].prev;
 	}
-	return D[0].count(R);
+	return true;
 }
 
 
