@@ -108,7 +108,7 @@ private:
 			}
 		}
 		solution.push_back(pi.back());
-		return true;
+		return G->ecc(solution) <= k;
 	}
 
 
