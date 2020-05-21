@@ -20,8 +20,8 @@ std::optional<std::vector<int>> constrained_set_cover(
 	std::vector<std::unordered_map<boost::dynamic_bitset<>, satisfied_by>> D(candidates.size() + 1);
 	D[0] = {{boost::dynamic_bitset<>(requirements.size()), {-1, boost::dynamic_bitset<>()}}};
 	for (int i = 0; i < candidates.size(); i++) {
-		for (auto [r, _] : D[i]) {
-			for (int j = 0; j < candidates[i].size(); j++) {
+		for (int j = 0; j < candidates[i].size(); j++) {
+			for (auto [r, _] : D[i]) {
 				D[i + 1][r | psi(candidates[i][j])] = {j, r};
 			}
 		}
