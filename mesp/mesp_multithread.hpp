@@ -9,6 +9,35 @@
 #include "mesp_inner.hpp"
 
 
+std::optional<path> check_path(const graph &G)
+{
+	int q = -1;
+	for (int u = 0; u < G.n; u++) {
+		if (G.neighbors(u).size() > 2) return std::nullopt;
+		if (G.neighbors(u).size() == 1) q = u;
+	}
+	if (q == -1) return std::nullopt;
+	path res;
+	res.reserve(G.n);
+	std::vector<int> visited(G.n, 0);
+	int p = q;
+	visited[p] = 1;
+	do {
+		res.push_back(q);
+		for (int v : G.neighbors(q)) {
+			if (v == p) continue;
+			p = q;
+			q = v;
+			break;
+		}
+		visited[q] = 1;
+	} while (G.neighbors(q).size() > 1);
+	res.push_back(q);
+	for (int v : visited) if (!v) return std::nullopt;
+	return res;
+}
+
+
 struct mesp_solution {
 	int k;
 	path P;
@@ -74,8 +103,12 @@ mesp_solution mesp_multithread(
 		}
 	};
 
+	auto path = check_path(*G);
+	if (path.has_value()) {
+		return {0, *path};
+	}
 
-	for (int k = 0; k <= G->n; k++) {
+	for (int k = 1; k <= G->n; k++) {
 		auto status = std::make_shared<threads_status>();
 		int attempts = 0;
 		if (C->size() >= 2) {
