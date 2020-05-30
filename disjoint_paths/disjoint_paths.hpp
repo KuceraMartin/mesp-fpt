@@ -70,29 +70,31 @@ std::shared_ptr<std::unordered_set<int>> modulator_to_disjoint_paths(std::shared
 				return true;
 			}
 
-			std::unordered_set<int> to_res;
-			for (auto n : G->neighbors(b)) {
-				if (res->count(n)) continue;
-				to_res.insert(n);
-			}
-			for (int keep_1 = 0; keep_1 < G->neighbors(b).size(); keep_1++) {
-				if (res->count(G->neighbors(b)[keep_1])) continue;
-				to_res.erase(G->neighbors(b)[keep_1]);
-				if (deg[b] == 3) {
-					res_insert(to_res);
-					if (solve(c - (int) to_res.size())) return true;
-					res_remove(to_res);
-				} else {
-					for (int keep_2 = keep_1 + 1; keep_2 < G->neighbors(b).size(); keep_2++) {
-						if (res->count(G->neighbors(b)[keep_2])) continue;
-						to_res.erase(G->neighbors(b)[keep_2]);
+			if (deg[b] - 2 <= c) {
+				std::unordered_set<int> to_res;
+				for (auto n : G->neighbors(b)) {
+					if (res->count(n)) continue;
+					to_res.insert(n);
+				}
+				for (int keep_1 = 0; keep_1 < G->neighbors(b).size(); keep_1++) {
+					if (res->count(G->neighbors(b)[keep_1])) continue;
+					to_res.erase(G->neighbors(b)[keep_1]);
+					if (deg[b] == 3) {
 						res_insert(to_res);
 						if (solve(c - (int) to_res.size())) return true;
 						res_remove(to_res);
-						to_res.insert(G->neighbors(b)[keep_2]);
+					} else {
+						for (int keep_2 = keep_1 + 1; keep_2 < G->neighbors(b).size(); keep_2++) {
+							if (res->count(G->neighbors(b)[keep_2])) continue;
+							to_res.erase(G->neighbors(b)[keep_2]);
+							res_insert(to_res);
+							if (solve(c - (int) to_res.size())) return true;
+							res_remove(to_res);
+							to_res.insert(G->neighbors(b)[keep_2]);
+						}
 					}
+					to_res.insert(G->neighbors(b)[keep_1]);
 				}
-				to_res.insert(G->neighbors(b)[keep_1]);
 			}
 
 			res_insert(b);
