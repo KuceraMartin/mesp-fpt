@@ -8,14 +8,16 @@
 #include "../common/graph.hpp"
 
 
-std::shared_ptr<std::unordered_set<int>> modulator_to_disjoint_paths(std::shared_ptr<const graph> G, const std::function<void(int)> &report_progress = [](int){})
-{
+std::shared_ptr<std::unordered_set<int>> modulator_to_disjoint_paths(
+	const std::shared_ptr<const graph> &G,
+	const std::function<void(int)> &report_progress = [](int){}
+) {
 	struct inner_solver {
 		std::shared_ptr<const graph> G;
 		std::vector<int> deg;
 		std::shared_ptr<std::unordered_set<int>> res;
 
-		explicit inner_solver(std::shared_ptr<const graph> &G):
+		explicit inner_solver(const std::shared_ptr<const graph> &G):
 			G(G),
 			res(std::make_shared<std::unordered_set<int>>())
 		{

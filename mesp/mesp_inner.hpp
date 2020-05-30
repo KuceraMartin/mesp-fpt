@@ -26,7 +26,7 @@ private:
 	std::unordered_map<int, int> e;
 
 public:
-	mesp_inner(std::shared_ptr<const graph> G, std::shared_ptr<const std::unordered_set<int>> &C, int k, int pi_first = -1, int pi_last = -1):
+	mesp_inner(const std::shared_ptr<const graph> &G, const std::shared_ptr<const std::unordered_set<int>> &C, int k, int pi_first = -1, int pi_last = -1):
 		G(G),
 		C(C),
 		k(k),

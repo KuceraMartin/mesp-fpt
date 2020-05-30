@@ -45,8 +45,8 @@ struct mesp_solution {
 
 
 mesp_solution mesp_multithread(
-	std::shared_ptr<const graph> G,
-	std::shared_ptr<const std::unordered_set<int>> C,
+	const std::shared_ptr<const graph> &G,
+	const std::shared_ptr<const std::unordered_set<int>> &C,
 	boost::asio::thread_pool &pool,
 	const std::function<void(int, double)> &report_progress = [](int, double) {}
 ) {
@@ -89,7 +89,7 @@ mesp_solution mesp_multithread(
 		mesp_inner inner;
 
 	public:
-		consumer(std::shared_ptr<threads_status> current_status, mesp_inner &&inner) :
+		consumer(const std::shared_ptr<threads_status> &current_status, mesp_inner &&inner) :
 				current_status(current_status),
 				inner(std::move(inner)) {}
 
