@@ -108,14 +108,13 @@ protected:
 			out->print_tty("\rk = %d\t%6.2f %%\t%.2f s", k, percent, duration_sec);
 		});
 
-		pool.join();
-
 		out->print_tty("\n\nMESP found for k = %d.\n", solution.k);
 		if (sol == out) out->print("\n");
 		sol->print("%zu %d\n", solution.P.size(), solution.k);
 		for (int u : solution.P) sol->print("%d ", u);
 		sol->print("\n");
 
+		pool.join();
 		return EXIT_SUCCESS;
 	}
 };
