@@ -18,8 +18,9 @@ public:
 protected:
 	void print_usage() const override {
 		out->print(
-			"Usage: " + cmd_name() + "\n"
-			"Finds the smallest modulator to disjoint paths for the graph provided in stdin.\n"
+			"Usage: " + cmd_name() + " [<options>...] [<graph-file>]\n"
+			"Finds the smallest modulator to disjoint paths in a given graph.\n"
+			"If no <graph-file> is provided, attempts to read from stdin.\n"
 			"\n"
 			"Options:\n"
 			"  -o <file>, --output <file>\t\tWrite the solution to <file> instead of stdout.\n"
@@ -32,14 +33,22 @@ protected:
 	}
 
 	int impl() const override {
+		optional<string> graph_filename;
 		optional<string> output_filename;
 
 		for (size_t i = 1; i < args.size(); i++) {
 			if (args[i] == "-o" || args[i] == "--output") {
 				output_filename = args[++i];
+			} else if (!graph_filename.has_value()) {
+				graph_filename = args[i];
 			} else {
 				throw unknown_argument_exception(args[i]);
 			}
+		}
+
+		auto graph_input = in;
+		if (graph_filename.has_value()) {
+			graph_input = make_shared<reader>(open(*graph_filename, "r"));
 		}
 
 		auto sol = out;
@@ -47,7 +56,7 @@ protected:
 			sol = make_shared<writer>(open(*output_filename, "w"));
 		}
 
-		auto G = read_graph(*in);
+		auto G = read_graph(*graph_input);
 
 		auto time0 = system_clock::now();
 
