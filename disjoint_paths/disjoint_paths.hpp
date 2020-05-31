@@ -138,7 +138,10 @@ std::shared_ptr<std::unordered_set<int>> modulator_to_disjoint_paths(
 	inner_solver solver(G);
 	for (int c = 0; c < G->n; c++) {
 		report_progress(c);
-		if (solver.solve(c)) return solver.res;
+		if (solver.solve(c)) {
+			report_progress(c);
+			return solver.res;
+		}
 	}
 	throw implementation_exception(); // should not reach here
 }
