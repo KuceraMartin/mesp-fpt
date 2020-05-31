@@ -24,6 +24,7 @@ protected:
 			"\n"
 			"Options:\n"
 			"  -o <file>, --output <file>\t\tWrite the solution to <file> instead of stdout.\n"
+			"\n"
 			"Input graph format:\n" +
 			graph_format_desc() +
 			"\n"
