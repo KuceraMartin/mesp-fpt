@@ -133,16 +133,4 @@ std::shared_ptr<std::unordered_set<int>> read_disjoint_paths(const reader &r)
 }
 
 
-path read_path(const reader &r)
-{
-	int size;
-	r.scan("%d", &size);
-	path P(size);
-	for (int i = 0; i < size; i++) {
-		r.scan("%d", &P[i]);
-	}
-	return P;
-}
-
-
 #endif //IMPL_INPUT_HPP
