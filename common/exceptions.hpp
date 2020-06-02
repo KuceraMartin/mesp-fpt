@@ -17,6 +17,12 @@ class graph_input_exception : public invalid_input_exception {
 	}
 };
 
+class disjoint_paths_input_exception : public invalid_input_exception {
+	std::string message() const noexcept override {
+		return "Invalid modulator to disjoint paths input.";
+	}
+};
+
 
 class invalid_argument_exception : public invalid_input_exception {
 private:

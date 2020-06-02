@@ -123,10 +123,10 @@ std::shared_ptr<std::unordered_set<int>> read_disjoint_paths(const reader &r)
 {
 	auto C = std::make_shared<std::unordered_set<int>>();
 	int c;
-	r.scan("%d", &c);
+	if (r.scan("%d", &c) != 1) throw disjoint_paths_input_exception();
 	for (int i = 0; i < c; i++) {
 		int u;
-		r.scan("%d", &u);
+		if (r.scan("%d", &u) != 1) throw disjoint_paths_input_exception();
 		C->insert(u);
 	}
 	return C;
